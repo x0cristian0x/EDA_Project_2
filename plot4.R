@@ -1,4 +1,5 @@
 library(ggplot2)
+library(dplyr)
 
 #Create path
 if(!file.exists("Project_2_EDA")){
@@ -17,16 +18,22 @@ NEI<-readRDS("Project_2_EDA/data/summarySCC_PM25.rds")
 SCC<-readRDS("Project_2_EDA/data/Source_Classification_Code.rds")
 
 
-# set subdata 1999 and 2008
-NEI<-subset(NEI,year=="1999"| year=="2008")
-
 # Merge NEI and SCC
 NEI<-merge(NEI,SCC,by = "SCC")
 
 # emissions from coal combustion-related sources changed from 1999-2008
 NEI<-NEI[grep("Coal",NEI$EI.Sector),]
-x<-ggplot(NEI,aes(y=Emissions,x=year))
-x + geom_point()
+
+# Group Data
+x<- NEI %>% 
+  group_by(year) %>% 
+  summarise(coal=sum(Emissions)) %>% 
+  select(coal,year)
+
+# plot
+x<-ggplot(data = x,aes(y=coal,x=year))
+x + geom_point()+ geom_line() + labs(x="Year", y="Coal ", 
+                                     title = "Coal of year")
 dev.copy(png,"Project_2_EDA/plot4.png")
 dev.off()
 

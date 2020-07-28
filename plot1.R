@@ -20,6 +20,8 @@ SCC<-readRDS("Project_2_EDA/data/Source_Classification_Code.rds")
 # Emition Total 1999-2008
 total<-tapply(NEI$Emissions, NEI$year, sum)
 total<-data.frame(Emition=total,year=row.names(total))
-plot(total$year,total$Emition,xlim = c(1999,2008))
+plot(total$year,total$Emition,xlim = c(1999,2008),type = "l",
+     main = "Total Emission of PM2.5 in US", ylab = "Total Emission",
+     xlab = "Year")
 dev.copy(png,"Project_2_EDA/plot1.png")
 dev.off()

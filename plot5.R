@@ -1,5 +1,5 @@
 library(ggplot2)
-
+library(dplyr)
 #Create path
 if(!file.exists("Project_2_EDA")){
   dir.create("Project_2_EDA")  }
@@ -17,18 +17,20 @@ NEI<-readRDS("Project_2_EDA/data/summarySCC_PM25.rds")
 SCC<-readRDS("Project_2_EDA/data/Source_Classification_Code.rds")
 
 
-
-# Set subdata 1999 and 2008, 
-NEI<-subset(NEI,year=="1999"| year=="2008")
-
 # Join Data NEI and SCC
 NEI<-merge(NEI,SCC,by = "SCC")
-
 
 
 # Emissions from vehicle from 1999-2008 in Baltimore City
 vehicle <-NEI[grep("Vehicle",NEI$SCC.Level.Two),]
 vehicle_baltimore<-subset(vehicle,fips=="24510")
-plot(vehicle_baltimore$year,vehicle_baltimore$Emissions)
+
+x<-vehicle_baltimore %>% 
+  group_by(year) %>% 
+  summarise(Emission_vehicle=sum(Emissions)) %>% 
+  select(year,Emission_vehicle)
+
+plot(x$year,x$Emission_vehicle,type = "l",main = "Emissions of Vehicle for year",
+     xlab = "year", ylab = "Emissions Vehicle")
 dev.copy(png,"Project_2_EDA/plot5.png")
 dev.off()
